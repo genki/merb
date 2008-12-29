@@ -1328,6 +1328,11 @@ class Merb::BootLoader::ReloadClasses < Merb::BootLoader
       paths << Merb.dir_for(:application)
     end
 
+    Merb::BootLoader::Templates::template_paths.each do |path|
+      LoadClasses::MTIMES[path] = File.mtime(path)
+      paths << path
+    end
+
     paths.flatten!
 
     TimedExecutor.every(Merb::Config[:reload_time] || 0.5) do
