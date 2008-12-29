@@ -1328,7 +1328,7 @@ class Merb::BootLoader::ReloadClasses < Merb::BootLoader
       paths << Merb.dir_for(:application)
     end
 
-    Merb::BootLoader::Templates::template_paths.each do |path|
+    Dir[Merb::load_paths[:view][0], "**/*.erb"].each do |path|
       LoadClasses::MTIMES[path] = File.mtime(path)
       paths << path
     end
