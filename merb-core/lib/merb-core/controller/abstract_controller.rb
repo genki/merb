@@ -67,7 +67,7 @@
 #     throw :halt, proc { access_denied }
 #     throw :halt, proc { Tidy.new(c.index) }
 #
-# ===== Filter Options (.before, .after, .add_filter, .if, .unless)
+# ===== Filter Options (.before, .after, .add_filter, .if, .unless, .prepend)
 # :only<Symbol, Array[Symbol]>::
 #   A list of actions that this filter should apply to
 #
@@ -84,6 +84,9 @@
 #   Arguments to be passed to the filter. Since we are talking method/proc calls,
 #   filter method or Proc should to have the same arity
 #   as number of elements in Array you pass to this option.
+#
+# :prepend<Symbol, Boolean>::
+#   Prepend the filter if this option is specified and being true.
 #
 # ===== Types (shortcuts for use in this file)
 # Filter:: <Array[Symbol, (Symbol, String, Proc)]>
@@ -111,7 +114,7 @@ class Merb::AbstractController
   # :api: private
   attr_accessor :content_type
 
-  FILTER_OPTIONS = [:only, :exclude, :if, :unless, :with]
+  FILTER_OPTIONS = [:only, :exclude, :if, :unless, :with, :prepend]
 
   self._before_filters, self._after_filters = [], []
   self._before_dispatch_callbacks, self._after_dispatch_callbacks = [], []
@@ -653,18 +656,21 @@ class Merb::AbstractController
     end
 
     opts = normalize_filters!(opts)
+
+    # if :prepend is true, the filter is prepended to the list.
+    position = opts.delete(:prepend) ? 0 : -1
     
     case filter
     when Proc
       # filters with procs created via class methods have identical signature
       # regardless if they handle content differently or not. So procs just
       # get appended
-      filters << [filter, opts]
+      filters.insert(position, [filter, opts])
     when Symbol, String
       if existing_filter = filters.find {|f| f.first.to_s == filter.to_s}
         filters[ filters.index(existing_filter) ] = [filter, opts]
       else
-        filters << [filter, opts]
+        filters.insert(position, [filter, opts])
       end
     else
       raise(ArgumentError, 

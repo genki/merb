@@ -30,9 +30,17 @@ describe Merb::AbstractController, " should support before and after filters" do
   it "should append before filters when added" do
     dispatch_should_make_body("TestBeforeFilterOrder", "bar filter")
   end
+  
+  it "should prepend before filters when added with prepend option" do
+    dispatch_should_make_body("TestBeforeFilterOrderWithPrepend", "bar filter")
+  end
 
   it "should append after filters when added" do
     dispatch_should_make_body("TestAfterFilterOrder", "bar filter")
+  end
+
+  it "should prepend after filters when added with prepend option" do
+    dispatch_should_make_body("TestAfterFilterOrderWithPrepend", "bar filter")
   end
   
   it "should support proc arguments to filters evaluated in the controller's instance" do

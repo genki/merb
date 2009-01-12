@@ -71,6 +71,26 @@ module Merb::Test::Fixtures
       end
     end
 
+    class TestBeforeFilterOrderWithPrepend < TestBeforeFilterOrder
+      before :baz, :prepend => true
+    
+      private
+      
+      def baz
+        @x = "baz filter"
+      end
+    end
+
+    class TestAfterFilterOrderWithPrepend < TestAfterFilterOrder
+      after :baz, :prepend => true
+    
+      private
+      
+      def baz
+        @body = "baz filter"
+      end
+    end
+
     class TestProcFilter < Testing
       before { @x = "proc filter1" }
       before Proc.new { @y = "proc filter2" }
